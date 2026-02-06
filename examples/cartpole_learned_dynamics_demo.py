@@ -120,7 +120,7 @@ def main():
   print("   Using random policy for data collection...")
   rng_key = jax.random.PRNGKey(0)
   rollout_data = collect_rollout_data(
-      env, random_policy, num_episodes=50, rng_key=rng_key
+      env, random_policy, rng_key, num_episodes=50
   )
   print(f"   Collected {len(rollout_data)} transitions")
   print()
@@ -132,11 +132,11 @@ def main():
   rng_key, train_key = jax.random.split(rng_key)
   trained_params, hidden_dims = train_dynamics_model(
       rollout_data,
+      train_key,
       hidden_dims=(256, 256),
       learning_rate=1e-3,
       num_epochs=50,
       batch_size=256,
-      rng_key=train_key,
   )
   print("   Training complete!")
   print()

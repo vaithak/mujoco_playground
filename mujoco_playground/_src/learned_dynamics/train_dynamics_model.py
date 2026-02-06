@@ -27,8 +27,8 @@ from mujoco_playground._src.learned_dynamics.simple_dynamics_model import Simple
 def collect_rollout_data(
     env,
     policy,
-    num_episodes: int = 100,
     rng_key: jax.Array,
+    num_episodes: int = 100,
     max_episode_length: int = 1000,
 ):
   """Collect state-action-next_state transitions from environment rollouts.
@@ -36,8 +36,8 @@ def collect_rollout_data(
   Args:
       env: Environment to collect data from
       policy: Policy to use for action selection (can be random)
-      num_episodes: Number of episodes to collect
       rng_key: Random key for initialization
+      num_episodes: Number of episodes to collect
       max_episode_length: Maximum length of each episode
 
   Returns:
@@ -81,21 +81,21 @@ def collect_rollout_data(
 
 def train_dynamics_model(
     train_data: List[Tuple],
+    rng_key: jax.Array,
     hidden_dims: Tuple[int, ...] = (256, 256),
     learning_rate: float = 1e-3,
     num_epochs: int = 100,
     batch_size: int = 256,
-    rng_key: jax.Array,
 ):
   """Train a dynamics model on collected transition data.
 
   Args:
       train_data: List of (qpos, qvel, action, next_qpos, next_qvel) transitions
+      rng_key: Random key for initialization
       hidden_dims: Hidden layer dimensions for MLP
       learning_rate: Learning rate for optimizer
       num_epochs: Number of training epochs
       batch_size: Batch size for training
-      rng_key: Random key for initialization
 
   Returns:
       Tuple of (trained model parameters, hidden_dims)

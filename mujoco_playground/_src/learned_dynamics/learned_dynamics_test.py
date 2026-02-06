@@ -185,7 +185,7 @@ class LearnedDynamicsTest(absltest.TestCase):
       return jax.random.uniform(rng, (self.env.action_size,), minval=-1, maxval=1)
 
     # Collect small amount of data
-    data = collect_rollout_data(self.env, random_policy, num_episodes=2, rng_key=self.rng_key)
+    data = collect_rollout_data(self.env, random_policy, self.rng_key, num_episodes=2)
 
     # Check data structure
     self.assertGreater(len(data), 0)
@@ -201,16 +201,16 @@ class LearnedDynamicsTest(absltest.TestCase):
       return jax.random.uniform(rng, (self.env.action_size,), minval=-1, maxval=1)
 
     # Collect small amount of data
-    data = collect_rollout_data(self.env, random_policy, num_episodes=2, rng_key=self.rng_key)
+    data = collect_rollout_data(self.env, random_policy, self.rng_key, num_episodes=2)
 
     # Train model (just a few epochs for testing)
     params, hidden_dims = train_dynamics_model(
         data,
+        self.rng_key,
         hidden_dims=(32, 32),
         learning_rate=1e-3,
         num_epochs=2,
         batch_size=32,
-        rng_key=self.rng_key,
     )
 
     # Check that params exist
@@ -224,11 +224,11 @@ class LearnedDynamicsTest(absltest.TestCase):
       return jax.random.uniform(rng, (self.env.action_size,), minval=-1, maxval=1)
 
     # Collect data
-    data = collect_rollout_data(self.env, random_policy, num_episodes=2, rng_key=self.rng_key)
+    data = collect_rollout_data(self.env, random_policy, self.rng_key, num_episodes=2)
 
     # Train model
     params, hidden_dims = train_dynamics_model(
-        data, hidden_dims=(32, 32), num_epochs=2, batch_size=32, rng_key=self.rng_key
+        data, self.rng_key, hidden_dims=(32, 32), num_epochs=2, batch_size=32
     )
 
     # Create learned env
