@@ -25,7 +25,11 @@ from mujoco_playground._src.learned_dynamics.simple_dynamics_model import Simple
 
 
 def collect_rollout_data(
-    env, policy, num_episodes: int = 100, rng_key: jax.Array = None
+    env,
+    policy,
+    num_episodes: int = 100,
+    rng_key: jax.Array,
+    max_episode_length: int = 1000,
 ):
   """Collect state-action-next_state transitions from environment rollouts.
 
@@ -34,13 +38,11 @@ def collect_rollout_data(
       policy: Policy to use for action selection (can be random)
       num_episodes: Number of episodes to collect
       rng_key: Random key for initialization
+      max_episode_length: Maximum length of each episode
 
   Returns:
       List of (qpos, qvel, action, next_qpos, next_qvel) tuples
   """
-  if rng_key is None:
-    rng_key = jax.random.PRNGKey(0)
-
   transitions = []
 
   for _ in range(num_episodes):
@@ -48,7 +50,7 @@ def collect_rollout_data(
     state = env.reset(reset_key)
 
     # Run episode
-    for step in range(1000):  # Max episode length
+    for step in range(max_episode_length):
       episode_key, action_key = jax.random.split(episode_key)
 
       # Get action from policy
@@ -83,7 +85,7 @@ def train_dynamics_model(
     learning_rate: float = 1e-3,
     num_epochs: int = 100,
     batch_size: int = 256,
-    rng_key: jax.Array = None,
+    rng_key: jax.Array,
 ):
   """Train a dynamics model on collected transition data.
 
@@ -98,9 +100,6 @@ def train_dynamics_model(
   Returns:
       Tuple of (trained model parameters, hidden_dims)
   """
-  if rng_key is None:
-    rng_key = jax.random.PRNGKey(42)
-
   # Initialize model
   model = SimpleDynamicsModel(hidden_dims=hidden_dims)
 

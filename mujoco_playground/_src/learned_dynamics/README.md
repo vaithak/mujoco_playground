@@ -26,10 +26,12 @@ env = registry.load('CartpoleBalance')
 def random_policy(state, rng):
     return jax.random.uniform(rng, (env.action_size,), minval=-1, maxval=1)
 
-rollout_data = collect_rollout_data(env, random_policy, num_episodes=100)
+rng_key = jax.random.PRNGKey(0)
+rollout_data = collect_rollout_data(env, random_policy, num_episodes=100, rng_key=rng_key)
 
 # 3. Train dynamics model
-trained_params, hidden_dims = train_dynamics_model(rollout_data)
+rng_key, train_key = jax.random.split(rng_key)
+trained_params, hidden_dims = train_dynamics_model(rollout_data, rng_key=train_key)
 
 # 4. Create learned dynamics environment
 dynamics_fn = create_dynamics_model_fn(trained_params, hidden_dims)
