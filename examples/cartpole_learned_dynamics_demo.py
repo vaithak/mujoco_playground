@@ -130,7 +130,7 @@ def main():
   print("   Model architecture: MLP with hidden dims (256, 256)")
   print("   Training for 50 epochs with batch size 256...")
   rng_key, train_key = jax.random.split(rng_key)
-  trained_params = train_dynamics_model(
+  trained_params, hidden_dims = train_dynamics_model(
       rollout_data,
       hidden_dims=(256, 256),
       learning_rate=1e-3,
@@ -143,7 +143,7 @@ def main():
 
   # 4. Create learned dynamics environment
   print("4. Creating learned dynamics environment...")
-  dynamics_fn = create_dynamics_model_fn(trained_params)
+  dynamics_fn = create_dynamics_model_fn(trained_params, hidden_dims)
   learned_env = LearnedDynamicsEnv(env, dynamics_fn)
   print("   Learned environment created!")
   print()

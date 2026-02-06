@@ -96,7 +96,7 @@ def train_dynamics_model(
       rng_key: Random key for initialization
 
   Returns:
-      Trained model parameters
+      Tuple of (trained model parameters, hidden_dims)
   """
   if rng_key is None:
     rng_key = jax.random.PRNGKey(42)
@@ -177,4 +177,4 @@ def train_dynamics_model(
       avg_loss = epoch_loss / num_batches
       print(f"Epoch {epoch + 1}/{num_epochs}, Loss: {avg_loss:.6f}")
 
-  return state.params
+  return state.params, hidden_dims

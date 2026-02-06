@@ -67,7 +67,7 @@ class LearnedDynamicsTest(absltest.TestCase):
     params = model.init(rng_key, qpos, qvel, action)
 
     # Create dynamics function
-    dynamics_fn = create_dynamics_model_fn(params)
+    dynamics_fn = create_dynamics_model_fn(params, hidden_dims=(64, 64))
 
     # Test with mock state data
     state = self.env.reset(rng_key)
@@ -89,7 +89,7 @@ class LearnedDynamicsTest(absltest.TestCase):
     params = model.init(rng_key, state.data.qpos, state.data.qvel, action)
 
     # Create learned env
-    dynamics_fn = create_dynamics_model_fn(params)
+    dynamics_fn = create_dynamics_model_fn(params, hidden_dims=(32, 32))
     learned_env = LearnedDynamicsEnv(self.env, dynamics_fn)
 
     # Test reset
@@ -115,7 +115,7 @@ class LearnedDynamicsTest(absltest.TestCase):
     params = model.init(rng_key, state.data.qpos, state.data.qvel, action)
 
     # Create learned env
-    dynamics_fn = create_dynamics_model_fn(params)
+    dynamics_fn = create_dynamics_model_fn(params, hidden_dims=(32, 32))
     learned_env = LearnedDynamicsEnv(self.env, dynamics_fn)
 
     # Reset and step
@@ -142,7 +142,7 @@ class LearnedDynamicsTest(absltest.TestCase):
     params = model.init(rng_key, state.data.qpos, state.data.qvel, action)
 
     # Create learned env
-    dynamics_fn = create_dynamics_model_fn(params)
+    dynamics_fn = create_dynamics_model_fn(params, hidden_dims=(32, 32))
     learned_env = LearnedDynamicsEnv(self.env, dynamics_fn)
 
     # JIT compile step function
@@ -167,7 +167,7 @@ class LearnedDynamicsTest(absltest.TestCase):
     params = model.init(rng_key, state.data.qpos, state.data.qvel, action)
 
     # Create learned env
-    dynamics_fn = create_dynamics_model_fn(params)
+    dynamics_fn = create_dynamics_model_fn(params, hidden_dims=(32, 32))
     learned_env = LearnedDynamicsEnv(self.env, dynamics_fn)
 
     # Check properties
@@ -204,7 +204,7 @@ class LearnedDynamicsTest(absltest.TestCase):
     data = collect_rollout_data(self.env, random_policy, num_episodes=2, rng_key=self.rng_key)
 
     # Train model (just a few epochs for testing)
-    params = train_dynamics_model(
+    params, hidden_dims = train_dynamics_model(
         data,
         hidden_dims=(32, 32),
         learning_rate=1e-3,
@@ -215,6 +215,7 @@ class LearnedDynamicsTest(absltest.TestCase):
 
     # Check that params exist
     self.assertIsNotNone(params)
+    self.assertEqual(hidden_dims, (32, 32))
 
   def test_learned_env_completes_episode(self):
     """Test that learned env can complete an episode without errors."""
@@ -226,12 +227,12 @@ class LearnedDynamicsTest(absltest.TestCase):
     data = collect_rollout_data(self.env, random_policy, num_episodes=2, rng_key=self.rng_key)
 
     # Train model
-    params = train_dynamics_model(
+    params, hidden_dims = train_dynamics_model(
         data, hidden_dims=(32, 32), num_epochs=2, batch_size=32, rng_key=self.rng_key
     )
 
     # Create learned env
-    dynamics_fn = create_dynamics_model_fn(params)
+    dynamics_fn = create_dynamics_model_fn(params, hidden_dims)
     learned_env = LearnedDynamicsEnv(self.env, dynamics_fn)
 
     # Run a short episode

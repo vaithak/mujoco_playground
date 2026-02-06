@@ -65,16 +65,17 @@ class SimpleDynamicsModel(nn.Module):
     return next_qpos, next_qvel
 
 
-def create_dynamics_model_fn(params):
+def create_dynamics_model_fn(params, hidden_dims: Tuple[int, ...] = (256, 256)):
   """Create a callable dynamics model from trained parameters.
 
   Args:
       params: Trained model parameters
+      hidden_dims: Hidden layer dimensions (must match the model that was trained)
 
   Returns:
       A function that takes (state_data, action) and returns updated state_data
   """
-  model = SimpleDynamicsModel()
+  model = SimpleDynamicsModel(hidden_dims=hidden_dims)
 
   def dynamics_fn(state_data, action):
     """Predict next state given current state and action.

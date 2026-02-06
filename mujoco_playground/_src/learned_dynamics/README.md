@@ -29,10 +29,10 @@ def random_policy(state, rng):
 rollout_data = collect_rollout_data(env, random_policy, num_episodes=100)
 
 # 3. Train dynamics model
-trained_params = train_dynamics_model(rollout_data)
+trained_params, hidden_dims = train_dynamics_model(rollout_data)
 
 # 4. Create learned dynamics environment
-dynamics_fn = create_dynamics_model_fn(trained_params)
+dynamics_fn = create_dynamics_model_fn(trained_params, hidden_dims)
 learned_env = LearnedDynamicsEnv(env, dynamics_fn)
 
 # 5. Use like a normal environment
@@ -60,6 +60,7 @@ Training utilities for dynamics models.
 - Supports mini-batch training
 - Uses Adam optimizer
 - MSE loss for state prediction
+- Returns both trained parameters and hidden dimensions
 
 ### `collect_rollout_data`
 Utilities for collecting training data from environment rollouts.
